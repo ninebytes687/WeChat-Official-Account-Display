@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>二维码与域名 | 毕业设计展</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #000;
+            color: #fff;
+            font-family: 'Inter', -apple-system, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .ambient-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(41, 151, 255, 0.15) 0%, rgba(0,0,0,0) 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 800px;
+            padding: 80px 20px 140px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 2.5rem;
+            background: linear-gradient(135deg, #2997ff 0%, #30b0c7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .process-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            width: 100%;
+        }
+
+        /* 二维码展示区域 */
+        .qr-stage {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .qr-wrapper {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            background: #fff;
+            border-radius: 16px;
+            padding: 12px;
+            box-shadow: 0 0 40px rgba(41, 151, 255, 0.3);
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .qr-wrapper:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 60px rgba(41, 151, 255, 0.5);
+        }
+
+        .qr-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        /* 扫描线动画 */
+        .scan-line {
+            position: absolute;
+            width: calc(100% - 24px);
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #2997ff, transparent);
+            box-shadow: 0 0 15px #2997ff;
+            top: 12px;
+            left: 12px;
+            border-radius: 2px;
+            opacity: 0;
+        }
+
+        .scan-line.active {
+            opacity: 1;
+            animation: scanMove 2s ease-in-out infinite;
+        }
+
+        @keyframes scanMove {
+            0% { top: 12px; }
+            50% { top: calc(100% - 15px); }
+            100% { top: 12px; }
+        }
+
+        /* 解析状态文字 */
+        .scan-status {
+            font-size: 0.9rem;
+            color: #86868b;
+            text-align: center;
+            height: 24px;
+            font-family: monospace;
+        }
+
+        .scan-status.active {
+            color: #2997ff;
+        }
+
+        /* 箭头 */
+        .arrow-down {
+            width: 40px;
+            height: 40px;
+            color: #2997ff;
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        /* 解析结果区域 */
+        .result-stage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .result-label {
+            font-size: 0.85rem;
+            color: #86868b;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .domain-box {
+            background: rgba(41, 151, 255, 0.1);
+            border: 1px solid rgba(41, 151, 255, 0.3);
+            border-radius: 12px;
+            padding: 1rem 2rem;
+            font-family: monospace;
+            font-size: 1.3rem;
+            color: #2997ff;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(41, 151, 255, 0.2);
+        }
+
+        /* 解析过程步骤 */
+        .steps-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .step-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0.3;
+            transition: all 0.3s ease;
+        }
+
+        .step-item.active {
+            opacity: 1;
+        }
+
+        .step-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .step-item.active .step-icon {
+            background: rgba(41, 151, 255, 0.2);
+            border-color: #2997ff;
+            box-shadow: 0 0 20px rgba(41, 151, 255, 0.3);
+        }
+
+        .step-text {
+            font-size: 0.75rem;
+            color: #86868b;
+            text-align: center;
+        }
+
+        .step-item.active .step-text {
+            color: #fff;
+        }
+
+/* 下一步按钮 */
+        .next-arrow-btn {
+            position: fixed;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(20, 20, 20, 0.85);
+            padding: 12px 24px;
+            border-radius: 30px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #2997ff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            width: max-content;
+            white-space: nowrap;
+        }
+
+        .next-arrow-btn.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .next-arrow-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* 页脚 */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 0.6rem 0;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #86868b;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 50;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .qr-wrapper {
+                width: 160px;
+                height: 160px;
+            }
+
+            .domain-box {
+                font-size: 1rem;
+                padding: 0.8rem 1.5rem;
+            }
+
+            .steps-container {
+                gap: 0.8rem;
+            }
+
+            .step-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+
+            .step-text {
+                font-size: 0.65rem;
+            }
+
+            .next-arrow-btn {
+                bottom: 40px;
+                padding: 10px 20px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-glow"></div>
+
+    <div class="container">
+        <h1 class="page-title">第一步：从扫码到识名</h1>
+
+        <div class="process-container">
+            <!-- 二维码区域 -->
+            <div class="qr-stage">
+                <div class="qr-wrapper" onclick="startScan()" id="qrWrapper">
+                    <img src="https://boost.jpgcdn.com/c2.jpgcdn.com/2026/06/11/e7M9.png" alt="公众号二维码">
+                    <div class="scan-line" id="scanLine"></div>
+                </div>
+                <div class="scan-status" id="scanStatus">点击二维码开始解析</div>
+            </div>
+
+            <!-- 向下箭头 -->
+            <svg class="arrow-down" id="arrowDown" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12l7 7 7-7"/>
+            </svg>
+
+            <!-- 解析结果区域 -->
+            <div class="result-stage" id="resultStage">
+                <div class="result-label">解析结果</div>
+                <div class="domain-box" id="domainBox">等待扫描...</div>
+            </div>
+
+            <!-- 解析步骤 -->
+            <div class="steps-container">
+                <div class="step-item" id="step1">
+                    <div class="step-icon">📷</div>
+                    <div class="step-text">图像捕捉</div>
+                </div>
+                <div class="step-item" id="step2">
+                    <div class="step-icon">🔍</div>
+                    <div class="step-text">定位图案</div>
+                </div>
+                <div class="step-item" id="step3">
+                    <div class="step-icon">📊</div>
+                    <div class="step-text">解码数据</div>
+                </div>
+                <div class="step-item" id="step4">
+                    <div class="step-icon">🔗</div>
+                    <div class="step-text">提取链接</div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <a href="dns.html" class="next-arrow-btn" id="nextBtn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 4V20M12 20L5 13M12 20L19 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>域名如何变成IP？去DNS解析</span>
+    </a>
+
+    <footer class="footer">
+        <p>&copy; 2026 报文侦探. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        let isScanning = false;
+
+        function startScan() {
+            if (isScanning) return;
+            isScanning = true;
+
+            const qrWrapper = document.getElementById('qrWrapper');
+            const scanLine = document.getElementById('scanLine');
+            const scanStatus = document.getElementById('scanStatus');
+            const arrowDown = document.getElementById('arrowDown');
+            const resultStage = document.getElementById('resultStage');
+            const domainBox = document.getElementById('domainBox');
+            const nextBtn = document.getElementById('nextBtn');
+
+            qrWrapper.style.cursor = 'default';
+            qrWrapper.style.pointerEvents = 'none';
+
+            const tl = gsap.timeline();
+
+            // 步骤1: 图像捕捉
+            tl.call(() => {
+                document.getElementById('step1').classList.add('active');
+                scanStatus.textContent = '正在捕捉二维码图像...';
+                scanStatus.classList.add('active');
+            })
+            .to({}, { duration: 0.5 })
+
+            // 步骤2: 定位图案 + 扫描线动画
+            .call(() => {
+                document.getElementById('step2').classList.add('active');
+                scanStatus.textContent = '定位二维码定位图案...';
+                scanLine.classList.add('active');
+            })
+            .to({}, { duration: 1.5 })
+
+            // 步骤3: 解码数据
+            .call(() => {
+                document.getElementById('step3').classList.add('active');
+                scanStatus.textContent = '解码二维码数据...';
+            })
+            .to({}, { duration: 0.8 })
+
+            // 步骤4: 提取链接 + 显示结果
+            .call(() => {
+                document.getElementById('step4').classList.add('active');
+                scanStatus.textContent = '解析完成！';
+                scanLine.classList.remove('active');
+            })
+            .to(arrowDown, { opacity: 1, y: 0, duration: 0.5 })
+            .to(resultStage, { opacity: 1, y: 0, duration: 0.6 }, "-=0.3")
+            .call(() => {
+                // 逐字显示域名
+                const domain = 'exhibit.ninebytes.top';
+                let i = 0;
+                domainBox.textContent = '';
+                const typeInterval = setInterval(() => {
+                    if (i < domain.length) {
+                        domainBox.textContent += domain[i];
+                        i++;
+                    } else {
+                        clearInterval(typeInterval);
+                        // 显示下一步按钮
+                        nextBtn.classList.add('visible');
+                        scanStatus.textContent = '✅ 解析完成';
+                    }
+                }, 80);
+            });
+        }
+
+        // 页面加载动画
+        window.addEventListener('DOMContentLoaded', () => {
+            gsap.from('.page-title', { duration: 1, y: -30, opacity: 0, ease: 'power3.out' });
+            gsap.from('.qr-stage', { duration: 0.8, scale: 0.8, opacity: 0, ease: 'back.out(1.7)', delay: 0.3 });
+            gsap.from('.step-item', { duration: 0.5, y: 20, opacity: 0, stagger: 0.1, ease: 'power2.out', delay: 0.6 });
+        });
+    </script>
+</body>
+</html>

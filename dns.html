@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNS 寻路漫游 | 毕业设计展</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #000;
+            color: #fff;
+            font-family: 'Inter', -apple-system, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .ambient-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(48, 176, 199, 0.12) 0%, rgba(0,0,0,0) 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .wrapper {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 150px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #30b0c7 0%, #2997ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .status-text {
+            font-size: 1rem;
+            color: #30b0c7;
+            font-weight: 300;
+            min-height: 1.5rem;
+        }
+
+        .status-text.success {
+            color: #34c759;
+        }
+
+/* DNS 流程展示 */
+        .dns-flow {
+            max-width: 400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+        }
+
+        .flow-row {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .flow-row.reverse {
+            flex-direction: column;
+        }
+
+        .dns-node {
+            background: #1c1c1e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1rem 1.2rem;
+            text-align: center;
+            width: 100%;
+            max-width: 260px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0.4;
+        }
+
+        .dns-node.active {
+            opacity: 1;
+            border-color: #30b0c7;
+            box-shadow: 0 0 25px rgba(48, 176, 199, 0.3);
+        }
+
+        .node-icon {
+            font-size: 1.8rem;
+            margin-bottom: 0.3rem;
+            display: block;
+        }
+
+        .node-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 0.15rem;
+        }
+
+        .node-info {
+            font-size: 0.7rem;
+            color: #86868b;
+        }
+
+        .dns-node.active .node-info {
+            color: #30b0c7;
+        }
+
+        /* 箭头 - 竖版 */
+        .flow-arrow {
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 1.2rem;
+            transition: all 0.4s ease;
+            padding: 0.4rem 0;
+        }
+
+        .flow-arrow.active {
+            color: #30b0c7;
+        }
+
+/* 返回路径 - 竖版 */
+        .return-path {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            width: 100%;
+        }
+
+        .return-path.visible {
+            opacity: 1;
+        }
+
+        .return-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .dashed-line {
+            width: 2px;
+            height: 30px;
+            background: repeating-linear-gradient(
+                180deg,
+                #30b0c7 0px,
+                #30b0c7 6px,
+                transparent 6px,
+                transparent 12px
+            );
+        }
+
+        /* 结果卡片 */
+        .result-card {
+            background: rgba(52, 199, 89, 0.1);
+            border: 1px solid rgba(52, 199, 89, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            max-width: 400px;
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .result-card.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .result-label {
+            font-size: 0.8rem;
+            color: #86868b;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-ip {
+            font-family: 'Courier New', monospace;
+            font-size: 1.5rem;
+            color: #34c759;
+        }
+
+        /* 下一步按钮 */
+        .next-arrow-btn {
+            position: fixed;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(20, 20, 20, 0.85);
+            padding: 12px 24px;
+            border-radius: 30px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #30b0c7;
+            text-decoration: none;
+            font-size: 0.9rem;
+            z-index: 100;
+            width: max-content;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .next-arrow-btn.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .next-arrow-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* 页脚 */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 0.6rem 0;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #86868b;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 50;
+        }
+
+/* 移动端适配 */
+        @media (max-width: 768px) {
+            .wrapper {
+                padding: 15px;
+                padding-bottom: 140px;
+            }
+
+            .page-title {
+                font-size: 1.4rem;
+            }
+
+            .status-text {
+                font-size: 0.9rem;
+            }
+
+            .dns-flow {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .dns-node {
+                padding: 0.8rem 1rem;
+                max-width: 240px;
+            }
+
+            .node-icon {
+                font-size: 1.5rem;
+            }
+
+            .node-name {
+                font-size: 0.85rem;
+            }
+
+            .node-info {
+                font-size: 0.65rem;
+            }
+
+            .flow-arrow {
+                padding: 0.3rem 0;
+                font-size: 1rem;
+            }
+
+            .result-ip {
+                font-size: 1.2rem;
+            }
+
+            .next-arrow-btn {
+                bottom: 40px;
+                padding: 10px 20px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-glow"></div>
+
+    <div class="wrapper">
+        <div class="header">
+            <h1 class="page-title">第二步：DNS 递归与迭代查询</h1>
+            <div class="status-text" id="statusText">域名寻路即将开始...</div>
+        </div>
+
+        <div class="dns-flow">
+            <!-- 第一行：客户端 -> LDNS -> 根DNS -> 权威DNS -->
+            <div class="flow-row">
+                <div class="dns-node" id="node-client">
+                    <span class="node-icon">💻</span>
+                    <div class="node-name">本机浏览器</div>
+                    <div class="node-info">发起查询</div>
+                </div>
+<div class="flow-arrow" id="arrow1">⬇</div>
+                <div class="dns-node" id="node-ldns">
+                    <span class="node-icon">📡</span>
+                    <div class="node-name">LDNS</div>
+                    <div class="node-info">本地运营商</div>
+                </div>
+                <div class="flow-arrow" id="arrow2">⬇</div>
+                <div class="dns-node" id="node-root">
+                    <span class="node-icon">🌲</span>
+                    <div class="node-name">根 DNS</div>
+                    <div class="node-info">全球 13 台</div>
+                </div>
+                <div class="flow-arrow" id="arrow3">⬇</div>
+                <div class="dns-node" id="node-auth">
+                    <span class="node-icon">🔒</span>
+                    <div class="node-name">权威 DNS</div>
+                    <div class="node-info">ninebytes.top</div>
+                </div>
+            </div>
+
+<!-- 返回路径 -->
+            <div class="return-path" id="returnPath">
+                <div class="dashed-line"></div>
+                <div class="return-row">
+                    <div class="dns-node" id="node-auth-ret" style="opacity: 1; width: auto; padding: 0.6rem 1rem;">
+                        <span style="font-size: 1.2rem;">🔒</span>
+                        <div style="font-size: 0.7rem; color: #30b0c7;">返回结果</div>
+                    </div>
+                </div>
+                <div class="dashed-line"></div>
+                <div class="return-row">
+                    <div class="dns-node" id="node-ldns-ret" style="opacity: 1; width: auto; padding: 0.6rem 1rem;">
+                        <span style="font-size: 1.2rem;">📡</span>
+                        <div style="font-size: 0.7rem; color: #30b0c7;">缓存结果</div>
+                    </div>
+                </div>
+                <div class="dashed-line"></div>
+                <div class="return-row">
+                    <div class="dns-node" id="node-client-ret" style="opacity: 1; width: auto; padding: 0.6rem 1rem;">
+                        <span style="font-size: 1.2rem;">💻</span>
+                        <div style="font-size: 0.7rem; color: #34c759;">拿到 IP！</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 结果卡片 -->
+            <div class="result-card" id="resultCard">
+                <div class="result-label">解析结果</div>
+                <div class="result-ip">185.199.108.153</div>
+            </div>
+        </div>
+    </div>
+
+    <a href="tcp-ip.html" class="next-arrow-btn" id="nextBtn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 4V20M12 20L5 13M12 20L19 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>拿到IP了！下一步：TCP握手</span>
+    </a>
+
+    <footer class="footer">
+        <p>&copy; 2026 报文侦探. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+// DNS 查询动画序列 - 每步约2.8秒
+        const steps = [
+            { node: 'node-client', status: '1. 本机浏览器发起 DNS 查询请求', delay: 1800 },
+            { arrow: 'arrow1', delay: 1200 },
+            { node: 'node-ldns', status: '2. LDNS 接收请求，缓存未命中', delay: 1800 },
+            { arrow: 'arrow2', delay: 1200 },
+            { node: 'node-root', status: '3. 根 DNS 指引查询路径', delay: 1800 },
+            { arrow: 'arrow3', delay: 1200 },
+            { node: 'node-auth', status: '4. 权威 DNS 返回解析结果', delay: 1800 },
+            { node: null, status: '5. 解析成功！获得目标服务器 IP', delay: 1500 }
+        ];
+
+        let currentStep = 0;
+
+        function runDNSStep() {
+            if (currentStep >= steps.length) {
+                // 动画完成，显示结果
+                showResult();
+                return;
+            }
+
+            const step = steps[currentStep];
+
+            if (step.node) {
+                document.querySelectorAll('.dns-node').forEach(n => n.classList.remove('active'));
+                const nodeEl = document.getElementById(step.node);
+                if (nodeEl) nodeEl.classList.add('active');
+            }
+
+            if (step.arrow) {
+                const arrowIndex = step.arrow.replace('arrow', '');
+                document.getElementById(step.arrow).classList.add('active');
+            }
+
+            if (step.status) {
+                const statusText = document.getElementById('statusText');
+                statusText.textContent = step.status;
+                if (currentStep === steps.length - 1) {
+                    statusText.classList.add('success');
+                }
+            }
+
+            currentStep++;
+            setTimeout(runDNSStep, step.delay);
+        }
+
+function showResult() {
+            const returnPath = document.getElementById('returnPath');
+            const resultCard = document.getElementById('resultCard');
+            const nextBtn = document.getElementById('nextBtn');
+
+// 显示返回路径
+            returnPath.classList.add('visible');
+
+            // 延迟显示结果卡片
+            setTimeout(() => {
+                resultCard.classList.add('show');
+            }, 1500);
+
+            // 显示下一步按钮
+            setTimeout(() => {
+                nextBtn.classList.add('show');
+            }, 2500);
+
+            // 缓慢滑动到底部
+            setTimeout(() => {
+                window.scrollTo({
+                    top: document.body.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }, 3000);
+        }
+
+        // 页面加载后开始动画
+        window.addEventListener('DOMContentLoaded', () => {
+            // 初始节点高亮
+            document.getElementById('node-client').classList.add('active');
+
+            // 延迟开始动画
+            setTimeout(runDNSStep, 1500);
+        });
+    </script>
+</body>
+</html>

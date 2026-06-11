@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>故事开始 | 毕业设计展</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #000;
+            color: #fff;
+            font-family: 'Inter', -apple-system, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .ambient-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(41, 151, 255, 0.1) 0%, rgba(0,0,0,0) 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .wrapper {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 150px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #2997ff 0%, #30b0c7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+            color: #86868b;
+            font-weight: 300;
+        }
+
+        /* 故事卡片 */
+        .story-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .story-intro {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .intro-text {
+            font-size: 1.1rem;
+            color: #86868b;
+            line-height: 1.6;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .intro-highlight {
+            color: #fff;
+            font-weight: 400;
+        }
+
+        /* 时间线 */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.2rem;
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        .timeline-marker {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .marker-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: rgba(41, 151, 255, 0.2);
+            border: 2px solid #2997ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .marker-dot.active {
+            background: #2997ff;
+            box-shadow: 0 0 15px rgba(41, 151, 255, 0.5);
+        }
+
+        .marker-line {
+            width: 2px;
+            flex: 1;
+            min-height: 40px;
+            background: linear-gradient(180deg, #2997ff 0%, rgba(41, 151, 255, 0.1) 100%);
+        }
+
+        .timeline-content {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 0.5rem;
+            flex: 1;
+            transition: all 0.4s ease;
+        }
+
+        .timeline-content:hover {
+            border-color: rgba(41, 151, 255, 0.3);
+            background: rgba(41, 151, 255, 0.05);
+        }
+
+        .content-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .content-icon {
+            font-size: 1.2rem;
+        }
+
+        .content-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .content-desc {
+            font-size: 0.8rem;
+            color: #86868b;
+            line-height: 1.5;
+        }
+
+        .content-page {
+            font-size: 0.7rem;
+            color: #2997ff;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* 下一步按钮 */
+        .next-arrow-btn {
+            position: fixed;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(20, 20, 20, 0.85);
+            padding: 12px 24px;
+            border-radius: 30px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #2997ff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            z-index: 100;
+            width: max-content;
+            white-space: nowrap;
+        }
+
+        .next-arrow-btn:hover {
+            background: rgba(41, 151, 255, 0.15);
+            border-color: #2997ff;
+        }
+
+        .next-arrow-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* 页脚 */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 0.6rem 0;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #86868b;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 50;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .wrapper {
+                padding: 15px;
+                padding-bottom: 140px;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .page-subtitle {
+                font-size: 0.9rem;
+            }
+
+            .intro-text {
+                font-size: 1rem;
+            }
+
+            .timeline-item {
+                gap: 1rem;
+            }
+
+            .timeline-content {
+                padding: 0.9rem 1rem;
+            }
+
+            .content-title {
+                font-size: 0.9rem;
+            }
+
+            .content-desc {
+                font-size: 0.75rem;
+            }
+
+            .next-arrow-btn {
+                bottom: 40px;
+                padding: 10px 20px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-glow"></div>
+
+    <div class="wrapper">
+        <div class="header">
+            <h1 class="page-title">故事的开始</h1>
+            <p class="page-subtitle">当你扫码到看到页面，发生了什么？</p>
+        </div>
+
+        <div class="story-container">
+            <div class="story-intro">
+                <p class="intro-text">
+                    当你用微信扫描公众号二维码，或在浏览器输入网址按下回车的那一刻，<span class="intro-highlight">一场跨越全球的数字旅程</span>就已经启程。
+                </p>
+            </div>
+
+            <div class="timeline" id="timeline">
+                <!-- 步骤1 -->
+                <div class="timeline-item">
+                    <div class="timeline-marker">
+                        <div class="marker-dot" id="dot1"></div>
+                        <div class="marker-line"></div>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="content-header">
+                            <span class="content-icon">📱</span>
+                            <span class="content-title">扫码识名</span>
+                        </div>
+                        <p class="content-desc">微信相机识别二维码图案，解析出其中的 URL 地址信息</p>
+                        <p class="content-page">第一步：二维码解析</p>
+                    </div>
+                </div>
+
+                <!-- 步骤2 -->
+                <div class="timeline-item">
+                    <div class="timeline-marker">
+                        <div class="marker-dot" id="dot2"></div>
+                        <div class="marker-line"></div>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="content-header">
+                            <span class="content-icon">🌐</span>
+                            <span class="content-title">域名寻路</span>
+                        </div>
+                        <p class="content-desc">DNS 系统将人类可读的域名翻译成计算机认识的 IP 地址</p>
+                        <p class="content-page">第二步：DNS 解析</p>
+                    </div>
+                </div>
+
+                <!-- 步骤3 -->
+                <div class="timeline-item">
+                    <div class="timeline-marker">
+                        <div class="marker-dot" id="dot3"></div>
+                        <div class="marker-line"></div>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="content-header">
+                            <span class="content-icon">🤝</span>
+                            <span class="content-title">握手建连</span>
+                        </div>
+                        <p class="content-desc">TCP 协议通过三次握手，确保客户端与服务器之间建立可靠连接</p>
+                        <p class="content-page">第三步：TCP 三次握手</p>
+                    </div>
+                </div>
+
+                <!-- 步骤4 -->
+                <div class="timeline-item">
+                    <div class="timeline-marker">
+                        <div class="marker-dot" id="dot4"></div>
+                        <div class="marker-line"></div>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="content-header">
+                            <span class="content-icon">🔒</span>
+                            <span class="content-title">加密传输</span>
+                        </div>
+                        <p class="content-desc">TLS 证书验证身份，非对称加密保护你的数据安全传输</p>
+                        <p class="content-page">第四步：HTTPS / TLS</p>
+                    </div>
+                </div>
+
+                <!-- 步骤5 -->
+                <div class="timeline-item">
+                    <div class="timeline-marker">
+                        <div class="marker-dot" id="dot5"></div>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="content-header">
+                            <span class="content-icon">🎉</span>
+                            <span class="content-title">页面呈现</span>
+                        </div>
+                        <p class="content-desc">服务器返回网页数据，浏览器解析渲染，你终于看到了这个页面</p>
+                        <p class="content-page">终点：恭喜完成旅程</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="qr-code.html" class="next-arrow-btn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 4V20M12 20L5 13M12 20L19 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>开始探索这段旅程</span>
+    </a>
+
+    <footer class="footer">
+        <p>&copy; 2026 报文侦探. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        // 时间线动画
+        window.addEventListener('DOMContentLoaded', () => {
+            const items = document.querySelectorAll('.timeline-item');
+            const dots = document.querySelectorAll('.marker-dot');
+
+            // 依次显示时间线项
+            items.forEach((item, index) => {
+                setTimeout(() => {
+                    item.style.opacity = '1';
+                    item.style.transform = 'translateX(0)';
+                    item.style.transition = 'all 0.5s ease';
+
+                    // 激活对应的点
+                    if (dots[index]) {
+                        dots[index].classList.add('active');
+                    }
+                }, 500 + index * 600);
+            });
+        });
+    </script>
+</body>
+</html>

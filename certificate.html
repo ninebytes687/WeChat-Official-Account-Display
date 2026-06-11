@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>荣获证书 | 毕业设计展</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Noto+Serif+SC:wght@600&family=Inter:wght@300;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #000;
+            color: #fff;
+            font-family: 'Inter', -apple-system, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .ambient-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, rgba(0,0,0,0) 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .wrapper {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 150px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 证书卡片 */
+        .certificate-card {
+            background: #f4f1ea;
+            color: #2c2c2c;
+            width: 100%;
+            max-width: 520px;
+            padding: 2rem;
+            border-radius: 4px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), inset 0 0 40px rgba(0, 0, 0, 0.05);
+            position: relative;
+            border: 10px double #d4af37;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            opacity: 0;
+            transform: scale(0.9) translateY(20px);
+        }
+
+        /* 证书装饰边框 */
+        .certificate-card::before {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            right: 4px;
+            bottom: 4px;
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            pointer-events: none;
+        }
+
+        .cert-no {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            color: #7a7a7a;
+            text-align: right;
+        }
+
+        .cert-title {
+            font-family: 'Cinzel', 'Noto Serif SC', serif;
+            font-size: 1.6rem;
+            color: #1a1a1a;
+            letter-spacing: 4px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .cert-body {
+            text-align: center;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1rem;
+            line-height: 1.8;
+            color: #3a3a3a;
+        }
+
+        .cert-body strong {
+            color: #000;
+            border-bottom: 1px solid #3a3a3a;
+            padding: 0 6px;
+        }
+
+        /* 证书底部信息 - 分开两行 */
+        .cert-footer {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            font-size: 0.8rem;
+            color: #5a5a5a;
+            align-items: flex-start;
+        }
+
+/* 公章样式 */
+        .official-seal {
+            position: absolute;
+            right: 30px;
+            bottom: 25px;
+            width: 85px;
+            height: 85px;
+            border: 3px double #FF0000;
+            border-radius: 50%;
+            color: #FF0000;
+            font-family: 'Noto Serif SC', serif;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transform: scale(3) rotate(-15deg);
+            opacity: 0;
+            mix-blend-mode: multiply;
+            pointer-events: none;
+        }
+
+        .seal-inner {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .seal-text-top {
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+        }
+
+        .seal-star {
+            font-size: 1.5rem;
+        }
+
+        .seal-text-bottom {
+            font-size: 0.7rem;
+        }
+
+        /* 签发按钮 */
+        .grant-btn {
+            margin-top: 2rem;
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid #d4af37;
+            color: #d4af37;
+            padding: 0.8rem 2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .grant-btn:hover {
+            background: rgba(212, 175, 55, 0.2);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .grant-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 返回按钮 */
+        .back-btn {
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(20, 20, 20, 0.85);
+            padding: 10px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #86868b;
+            text-decoration: none;
+            font-size: 0.85rem;
+            width: max-content;
+            white-space: nowrap;
+        }
+
+        .back-btn:hover {
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .back-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* 页脚 */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 0.6rem 0;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #86868b;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 50;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .wrapper {
+                padding: 15px;
+                padding-bottom: 140px;
+            }
+
+            .certificate-card {
+                max-width: 320px;
+                padding: 1.5rem;
+                border-width: 8px;
+            }
+
+            .cert-title {
+                font-size: 1.3rem;
+                letter-spacing: 2px;
+            }
+
+            .cert-body {
+                font-size: 0.9rem;
+                line-height: 1.6;
+            }
+
+            .cert-footer {
+                font-size: 0.7rem;
+            }
+
+            .official-seal {
+                width: 70px;
+                height: 70px;
+                right: 20px;
+                bottom: 20px;
+            }
+
+            .seal-text-top {
+                font-size: 0.6rem;
+            }
+
+            .seal-star {
+                font-size: 1.2rem;
+            }
+
+            .seal-text-bottom {
+                font-size: 0.55rem;
+            }
+
+            .grant-btn {
+                padding: 0.7rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .back-btn {
+                padding: 8px 16px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-glow"></div>
+
+    <div class="wrapper">
+        <div class="certificate-card" id="certificateCard">
+            <div class="cert-no">NO. <span id="serialNumber">加载中...</span></div>
+
+            <div class="cert-title">网络冲浪合格证书</div>
+
+            <div class="cert-body">
+                恭喜您成功通过由<br>
+                <strong>报文侦探</strong> 导览的数字视觉漫游。<br>
+                您已全面掌握从域名解析到 TLS 加密的网络底层奥秘。
+            </div>
+
+            <div class="cert-footer">
+                <div>认证单位：报文侦探</div>
+                <div>签发日期：<span id="currentDate">加载中...</span></div>
+            </div>
+
+            <div class="official-seal" id="stamp">
+                <div class="seal-inner">
+                    <span class="seal-text-top">报文侦探</span>
+                    <span class="seal-star">★</span>
+                    <span class="seal-text-bottom">认证</span>
+                </div>
+            </div>
+        </div>
+
+        <button class="grant-btn" id="grantBtn" onclick="grantCertificate()">
+            <span>📜</span>
+            <span>签发我的专属证书</span>
+        </button>
+
+        <a href="index.html" class="back-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            <span>回到起点重新体验</span>
+        </a>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2026 报文侦探. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        // 生成证书编号：2位大写字母 + 6位数字
+        function generateSerialNumber() {
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const letter1 = letters[Math.floor(Math.random() * letters.length)];
+            const letter2 = letters[Math.floor(Math.random() * letters.length)];
+            const numbers = String(Math.floor(Math.random() * 1000000)).padStart(6, '0');
+            return letter1 + letter2 + numbers;
+        }
+
+        // 获取实际日期
+        function getCurrentDate() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}.${month}.${day}`;
+        }
+
+        // 页面加载时初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            // 设置证书编号
+            document.getElementById('serialNumber').textContent = generateSerialNumber();
+
+            // 设置签发日期
+            document.getElementById('currentDate').textContent = getCurrentDate();
+
+            // 证书卡片淡入动画
+            gsap.to("#certificateCard", {
+                opacity: 1,
+                scale: 1,
+                y: 0,
+                duration: 1,
+                ease: "power4.out"
+            });
+        });
+
+        // 签发证书 - 公章砸下动画
+        function grantCertificate() {
+            const stamp = document.getElementById('stamp');
+            const btn = document.getElementById('grantBtn');
+
+            // 禁用按钮
+            btn.disabled = true;
+            gsap.to(btn, { opacity: 0.5, duration: 0.3 });
+
+            // 公章砸下动画
+            const tl = gsap.timeline();
+
+            tl.to(stamp, {
+                opacity: 0.85,
+                scale: 1,
+                rotation: -10,
+                duration: 0.3,
+                ease: "power2.in"
+            })
+            .to("#certificateCard", {
+                y: 3,
+                duration: 0.05,
+                yoyo: true,
+                repeat: 1
+            })
+            .to(stamp, {
+                scale: 1.03,
+                duration: 0.05
+            })
+            .to(stamp, {
+                scale: 1,
+                duration: 0.05
+            });
+        }
+    </script>
+</body>
+</html>

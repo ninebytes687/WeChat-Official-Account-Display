@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>关于我与公众号 | 毕业设计展</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #000;
+            color: #fff;
+            font-family: 'Inter', -apple-system, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .ambient-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(41, 151, 255, 0.15) 0%, rgba(0,0,0,0) 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .wrapper {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 150px;
+        }
+
+        .content {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: start;
+            padding-top: 10px;
+        }
+
+        .left-section {
+            text-align: left;
+        }
+
+        .brand-tag {
+            font-size: 0.9rem;
+            color: #2997ff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+        }
+
+        .main-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+
+        .main-title .gradient-text {
+            background: linear-gradient(135deg, #2997ff 0%, #30b0c7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .main-title .sub-title {
+            color: #fff;
+        }
+
+        .description {
+            font-size: 1.1rem;
+            color: #86868b;
+            line-height: 1.6;
+        }
+
+        .right-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 2rem;
+            text-align: left;
+            backdrop-filter: blur(20px);
+        }
+
+        .info-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .info-card p {
+            color: #86868b;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .next-arrow-btn {
+            position: fixed;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(20, 20, 20, 0.85);
+            padding: 12px 24px;
+            border-radius: 30px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #2997ff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            z-index: 100;
+        }
+
+        .next-arrow-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 0.6rem 0;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #86868b;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 50;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .wrapper {
+                padding: 15px;
+                padding-bottom: 140px;
+            }
+
+            .content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                padding-top: 5px;
+            }
+
+            .left-section {
+                text-align: center;
+            }
+
+            .main-title {
+                font-size: 2rem;
+            }
+
+            .description {
+                font-size: 0.95rem;
+            }
+
+            .info-card {
+                padding: 1.5rem;
+            }
+
+            .next-arrow-btn {
+                bottom: 40px;
+                padding: 10px 20px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-glow"></div>
+
+    <div class="wrapper">
+        <div class="content">
+            <div class="left-section">
+                <div class="brand-tag">Project Overview</div>
+                <h1 class="main-title">
+                    <span class="gradient-text">用硬核技术</span><br>
+                    <span class="sub-title">聊透网络底层</span>
+                </h1>
+                <p class="description">打破死板的教科书，探索每一束光信号在互联网世界里的奇幻漂流。</p>
+            </div>
+
+            <div class="right-section">
+                <div class="info-card">
+                    <h3>💡 账号定位</h3>
+                    <p>专注计算机网络与网络协议讲解。不掉书袋，用最生动的硬核大白话，揭秘高并发高可用架构与网络黑科技。</p>
+                </div>
+                <div class="info-card">
+                    <h3>🎓 毕业设计运营成果</h3>
+                    <p>通过微信公众号平台进行深度运营，构建连载技术专题，将复杂的网络模型可视化，实现技术破圈。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="journey.html" class="next-arrow-btn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 4V20M12 20L5 13M12 20L19 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>下一步：了解故事的开始</span>
+    </a>
+
+    <footer class="footer">
+        <p>&copy; 2026 报文侦探. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            gsap.from(".left-section", { duration: 1, x: -50, opacity: 0, ease: "power3.out" });
+            gsap.from(".info-card", { duration: 1, x: 50, opacity: 0, stagger: 0.2, ease: "power3.out" });
+        });
+    </script>
+</body>
+</html>
