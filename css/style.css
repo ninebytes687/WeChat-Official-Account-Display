@@ -1,0 +1,208 @@
+/* ==========================================================================
+   📱 移动端与手机完美适配 (Responsive Design) - 顶置无空白最终版
+   ========================================================================== */
+@media (max-width: 768px) {
+    /* ⚡ 锁死手机端的根节点和视口宽度，彻底消除横向Bug */
+    html, body {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important; 
+    }
+
+    /* 1. 彻底清除 body 的默认居中和多余内边距 */
+    body {
+        overflow-y: auto !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        padding: 0 !important; 
+        display: block !important; /* 强制流式布局 */
+    }
+
+    /* 🎯 终极修复：把内容容器强制拉回顶部，消灭大空白 */
+    .container {
+        height: auto !important;
+        min-height: 70vh !important;
+        width: 100% !important; 
+        max-width: 100% !important;
+        padding: 40px 20px 120px 20px !important; /* 顶端留出 40px 高级留白，底端留 120px 给固定按钮，中间无多余空白 */
+        margin: 0 !important;
+        display: flex !important;      /* 手机端改回垂直弹性，但方向改为列 */
+        flex-direction: column !important;
+        justify-content: flex-start !important; /* 核心：让所有组件从最上方开始紧凑排列 */
+        align-items: center !important;
+        box-sizing: border-box !important;
+    }
+
+    /* ⚡ 防止背景炫酷光晕在手机端把宽度撑开 */
+    .ambient-glow {
+        width: 280px !important;  
+        height: 280px !important;
+        top: 10% !important; /* 光晕跟随上移 */
+    }
+
+    /* 🎯 下一步胶囊按钮死死固定在手机屏幕底部，雷打不动 */
+    .next-arrow-btn {
+        position: fixed !important;
+        bottom: 50px !important;      
+        left: 50% !important;
+        transform: translateX(-50%) !important; 
+        width: max-content !important;  
+        max-width: 90vw !important;    
+        margin: 0 !important;
+        z-index: 9999 !important;      
+        background: rgba(20, 20, 20, 0.85) !important; 
+        padding: 10px 20px !important;  
+        border-radius: 30px !important; 
+        backdrop-filter: blur(15px) !important;
+        -webkit-backdrop-filter: blur(15px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important; 
+        display: flex !important;
+        flex-direction: row !important; 
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;           
+    }
+    
+    .arrow-text {
+        margin-top: 0 !important;
+        font-size: 0.9rem !important;
+        white-space: nowrap !important; 
+        color: #2997ff !important;     
+    }
+
+    .next-arrow-btn svg {
+        animation: bounce-mobile 2s infinite !important;
+        flex-shrink: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* 2. 各页大字报排版自适应优化 */
+    .hero-title {
+        font-size: 2rem !important;
+        line-height: 1.3 !important;
+        text-align: center !important;
+        margin-top: 20px !important; /* 适当给大标题加点上边距 */
+        margin-bottom: 1rem !important;
+    }
+    .hero-desc {
+        font-size: 0.95rem !important;
+        padding: 0 !important;
+        text-align: center !important;
+        line-height: 1.6 !important;
+        margin-bottom: 2rem !important;
+    }
+
+    /* 3. 关于我卡片流式排列 */
+    .about-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        gap: 1.5rem !important;
+        margin-bottom: 0 !important;
+        margin-top: -10px !important;
+    }
+
+    /* about.html 顶部对齐处理 - 覆盖默认的justify-content: center */
+    .container {
+        justify-content: flex-start !important;
+        padding-top: 0 !important;
+    }
+    .left-brand {
+        text-align: center !important;
+        width: 100% !important;
+        margin-top: 0 !important;
+    }
+    .left-brand h2, .left-brand .hero-desc {
+        text-align: center !important;
+    }
+    .left-brand .hero-title {
+        margin-top: 0 !important;
+    }
+    .left-brand .brand-tag {
+        margin-top: 0 !important;
+    }
+    .right-cards {
+        width: 100% !important; 
+        gap: 1rem !important;
+    }
+    .info-card {
+        width: 100% !important; 
+        padding: 1.25rem !important; 
+        box-sizing: border-box !important;
+    }
+
+    /* 4. DNS 树状解析节点 */
+    .dns-zone {
+        width: 100%;
+        gap: 5px;
+        margin: 2rem 0 !important;
+        box-sizing: border-box !important;
+    }
+    .dns-node {
+        padding: 0.6rem 0.3rem;
+        width: 23%;
+        box-sizing: border-box !important;
+    }
+    .dns-node h4 { font-size: 0.75rem; }
+    .dns-node p { display: none; }
+
+    /* 5. TCP 三次握手区域 */
+    .handshake-area { 
+        width: 100% !important; 
+        max-width: 100% !important;
+        height: 260px; 
+        margin: 1rem 0 !important;
+        box-sizing: border-box !important;
+    }
+    .side-label { font-size: 0.8rem; }
+
+    /* 6. HTTPS 安全盾牌 */
+    .secure-container { flex-direction: column; gap: 1.5rem; margin: 2rem 0 !important; }
+
+    /* 7. 终点站：证书 */
+    .paper-certificate {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto;
+        padding: 1.5rem 1rem;
+        border-width: 6px;
+        box-sizing: border-box !important;
+        margin-top: 10px !important;
+    }
+}
+
+@keyframes bounce-mobile {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(4px); }
+    60% { transform: translateY(2px); }
+}
+
+/* ==========================================================================
+   页脚版权信息样式
+   ========================================================================== */
+.footer {
+    width: 100%;
+    padding: 0.8rem 0;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #86868b;
+    background: rgba(0, 0, 0, 0.3);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.footer p {
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .footer {
+        bottom: 0;
+        font-size: 0.7rem;
+        padding: 0.6rem 0;
+    }
+}
