@@ -58,10 +58,26 @@
 
         .brand-tag {
             font-size: 0.9rem;
-            color: #2997ff;
             text-transform: uppercase;
             letter-spacing: 2px;
             margin-bottom: 1rem;
+            background: linear-gradient(90deg,
+                #34c759 0%, #5ac8fa 25%, #ff9500 50%,
+                #30b0c7 75%, #34c759 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 400% 100%;
+            animation: brandGradient 8s ease-in-out infinite;
+        }
+
+        @keyframes brandGradient {
+            0%, 100% {
+                background-position: 0% 0%;
+            }
+            50% {
+                background-position: 100% 0%;
+            }
         }
 
         .main-title {
@@ -72,10 +88,23 @@
         }
 
         .main-title .gradient-text {
-            background: linear-gradient(135deg, #2997ff 0%, #30b0c7 100%);
+            background: linear-gradient(90deg,
+                #ff9500 0%, #ff2d55 20%, #af52de 40%,
+                #2997ff 60%, #30b0c7 80%, #ff9500 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            background-size: 300% 100%;
+            animation: titleGradient 6s ease-in-out infinite;
+        }
+
+        @keyframes titleGradient {
+            0%, 100% {
+                background-position: 100% 0%;
+            }
+            50% {
+                background-position: 0% 0%;
+            }
         }
 
         .main-title .sub-title {
