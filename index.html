@@ -60,14 +60,35 @@
         }
 
         .gradient-text {
-            background: linear-gradient(135deg, #2997ff 0%, #30b0c7 50%, #34c759 100%);
+            background: linear-gradient(90deg,
+                #2997ff 0%, #30b0c7 16%, #34c759 33%,
+                #5ac8fa 50%, #ff9500 66%, #2997ff 83%, #30b0c7 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            background-size: 300% 100%;
+            animation: gradientShift 6s ease-in-out infinite;
+        }
+
+        /* 渐变颜色流畅切换动画 - 通过移动背景位置实现 */
+        @keyframes gradientShift {
+            0%, 100% {
+                background-position: 0% 0%;
+            }
+            50% {
+                background-position: 100% 0%;
+            }
         }
 
         .sub-hero {
             color: #fff;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
         }
 
         .hero-desc {
@@ -77,6 +98,35 @@
             font-weight: 300;
             max-width: 480px;
             margin: 0 auto;
+        }
+
+        /* 第一个整体的浮动动画 - 向上浮动 */
+        @keyframes floatUpDown {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        /* 第二个整体的浮动动画 - 向下浮动，与第一个错开相位避免相撞 */
+        @keyframes floatUpDown2 {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(8px);
+            }
+        }
+
+        /* 入场动画完成后启用浮动动画 */
+        .hero-title.float-active {
+            animation: floatUpDown 4s ease-in-out infinite;
+        }
+
+        .hero-desc.float-active {
+            animation: floatUpDown2 4s ease-in-out infinite;
         }
 
         .highlight {
@@ -213,7 +263,12 @@
                 opacity: 0,
                 y: 20,
                 ease: "power2.out"
-            }, "-=0.3");
+            }, "-=0.3")
+            .add(() => {
+                // 入场动画完成后启用浮动呼吸动画
+                document.querySelector('.hero-title').classList.add('float-active');
+                document.querySelector('.hero-desc').classList.add('float-active');
+            });
         });
     </script>
 </body>
