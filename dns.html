@@ -376,7 +376,7 @@
             <!-- 结果卡片 -->
             <div class="result-card" id="resultCard">
                 <div class="result-label">解析结果</div>
-                <div class="result-ip">185.199.108.153</div>
+                <div class="result-ip" id="resultIP">加载中...</div>
             </div>
         </div>
     </div>
@@ -446,6 +446,16 @@ function showResult() {
 
 // 显示返回路径
             returnPath.classList.add('visible');
+
+            // 随机选择一个IP显示
+            const ips = [
+                '216.198.*.65',
+                '64.29.*.65',
+                '216.198.*.1',
+                '64.29.*.1'
+            ];
+            const randomIP = ips[Math.floor(Math.random() * ips.length)];
+            document.getElementById('resultIP').textContent = randomIP;
 
             // 延迟显示结果卡片
             setTimeout(() => {
